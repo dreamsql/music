@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="app-mobile-web-app-capable" content="yes">    
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>goldenegg</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Swiper/4.0.6/css/swiper.min.css">
+    <link rel="stylesheet" href="https://shared.ydstatic.com/ead/dynamic/template_goldenEgg.css">
+    <script>
+        (function setClear() {
+            var win = window;
+            var baseFontSize = 100;
+            var doc = document.documentElement;
+            var dpr = win.devicePixelRatio || 1;
+            var scale = 1/dpr;
+            var meta = document.querySelector('meta[name="viewport"]');
+            if (!meta) {
+                meta = document.createElement('meta');
+                meta.setAttribute('name', 'viewport');
+                document.querySelector('head').append(meta);
+            }
+            meta.setAttribute('content', 'width=device-width,initial-scale=' + scale);
+            // 默认dpr为2的时候fontSize为100px,dpr为1的时候为50px,以此类推
+            // doc.style.fontSize = baseFontSize/2 * dpr + 'px';
+            doc.style.fontSize = (doc.clientWidth/750*2/dpr)*baseFontSize/2 * dpr + 'px';
+        })()
+    </script>
+    <script>
+        var _hmt = _hmt || [];
+        (function() {
+          var hm = document.createElement("script");
+          hm.src = "https://hm.baidu.com/hm.js?f11570e6747711aff8fb32ff2e26ec51";
+          var s = document.getElementsByTagName("script")[0]; 
+          s.parentNode.insertBefore(hm, s);
+        })();
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+    <script src="https://shared.ydstatic.com/js/dynamic/axios.min.js"></script>
+    <script src="https://shared.ydstatic.com/js/dynamic/swiper.min.js"></script>
+    <script src="https://shared.ydstatic.com/js/dynamic/fastclick.min.js"></script>
+</head>
+<body>
+    <div 
+        class="egg" 
+        id="app"
+        v-bind:class="{ 'show-modal': show_rule || show_prizelist }">
+        <div class="egg-content-container">
+            <!-- 顶部banner -->
+            <div class="egg-content-banner">
+                <div class="egg-content-rule" @click='bind_show_rule'>规则</div>
+                <div class="egg-content-myprize" @click='bind_show_prizelist'></div>
+            </div>
+            <div class="egg-content-main">
+                <div class="egg-content-hammer-container"
+                    :style='hammerStyle'
+                    ref='hammer'
+                    @transitionend='bind_hammer_end'>
+                    <div class="egg-content-hammer"></div>
+                </div>
+                <div class="egg-content-count">
+                    <span>今日剩余免费</span>
+                    <span>{{egg_count}}</span>
+                    <span>次</span>
+                </div>
+                <div class="egg-content-items-container">
+                    <div class="egg-content-item" v-for='(egg, index) in eggLists'>
+                        <div 
+                            class="egg-content-item-tips" 
+                            v-show="egg.isstart"></div>
+                        <!-- 原始蛋 -->
+                        <div 
+                            class="egg-content-item-start" 
+                            v-show="egg.isstart"
+                            v-bind:class="{ egg_active: egg.isshow }"
+                            @click="bind_egg_tap(index, $event)"></div>
+                        <!-- 正在破的蛋 -->
+                        <div class="egg-content-item-breaking" v-show="egg.isbreak"></div>
+                        <!-- 破蛋 -->
+                        <div class="egg-content-item-end" v-show="egg.isend"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="egg-content-prizelist swiper-container">
+                <div class="egg-content-prizelist-wrapper swiper-wrapper">
+                    <prize-item 
+                        class="swiper-slide"
+                        ref='prizeRef'
+                        v-for="item in prizeLists" 
+                        :prizeItem="item" 
+                        :key="item.text">
+                    </prize-item>
+                </div>
+                <div class="swiper-scrollbar"></div>
+                <div class="egg-content-prizelist-header">
+                    <div class="egg-content-prizelist-headerword">
+                        奖品
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div 
+            class="egg-rule-container"
+            v-bind:class="{ 'egg-rule-container-active': show_rule }">
+            <div 
+                class="egg-rule-content" 
+                v-bind:class="{ 'egg-rule-content-active': show_rule }">
+                <div class="egg-rule-header">
+                    <div 
+                        class="egg-rule-close"
+                        @click='bind_hide_rule'>
+                        <span>+</span>    
+                    </div>
+                    活动规则
+                </div>
+                <div class="egg-rule-description">
+                    参与活动即有机会获得幸运奖~每天抽奖机会{{egg_count_max}}次免费。此活动为概率中奖，奖品数量有限，祝好运！
+                    <div v-for="(item, index) in prizeLists">
+                        惊喜{{index+1}}: {{item.text}}
+                    </div>
+                    －－－－－－－－－－－－－－－－<br>
+                    重要声明：<br>
+                    1.奖品将在活动结束后5-10个工作日安排发放,请耐心等待<br>
+                    2.优惠券类奖品的使用规则详见每个优惠券的介绍页<br>
+                    3.请兑换后仔细阅读使用流程,如有疑问,可直接联系客服专线:400-630-5186或客服QQ:3511735466(工作日9:00至18:00)<br>
+                    4.通过非法途径获得奖品的,主办方有权不提供奖品
+                </div>
+            </div>
+        </div>
+        <div 
+            class="egg-prize-container" 
+            v-show='show_prize'>
+            <div 
+                class="egg-prize-redbag"
+                ref='redbag_container'>
+                <div class="egg-prize-redbag-head">
+                    <div 
+                        class="egg-prize-redbag-close"
+                        @click='bind_hide_redbag'>+
+                    </div>
+                </div>
+                <div class="egg-prize-redbag-footer">
+                    <div class="egg-prize-redbag-content">
+                        <span>～恭喜你～</span>
+                        <span class="egg-prize-redbag-desc" style="margin: 0.15rem">{{prize.title}}</span>        
+                        <div 
+                            class="egg-prize-redbag-jump" 
+                            @click="bind_prize_jump">
+                            点击领取
+                        </div>
+                    </div>
+                </div>
+                <div 
+                    class="egg-prize-redbag-img"
+                    ref='redbag_img'>
+                    <img :src="prize.mainimage">
+                </div>
+            </div>
+        </div>
+        <div 
+            class="egg-prizelist-container"
+            v-bind:class="{ 'egg-prizelist-container-active': show_prizelist }">
+            <div 
+                class="egg-prizelist-content" 
+                v-bind:class="{ 'egg-prizelist-content-active': show_prizelist }">
+                <div class="egg-prizelist-header">
+                    <div 
+                        class="egg-prizelist-close"
+                        @click='bind_hide_prizelist'>
+                        <span>+</span>    
+                    </div>
+                    奖品列表
+                </div>
+                <div class="egg-prizelist-description">
+                    <div 
+                        v-for="(item, index) in getPrizeLists" 
+                        class="egg-prizelist-desccontainer"
+                        @click="bind_getprize_jump(item)">
+                        <div class="egg-prizelist-img">
+                            <img :src="item.url">
+                        </div>
+                        <div class="egg-prizelist-desccontent">
+                            <span>{{item.text}}</span>
+                            <!-- <span>有效期:长期有效</span> -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="http://shared.ydstatic.com/js/yadk/1.1.2.js"></script>
+    <!-- <script src="https://shared.ydstatic.com/ead/dynamic/template_goldenEgg_es5_latest_list.js"></script> -->
+    <script src="./template_goldenEgg_es5_latest_list.js"></script>
+    <script>
+        // 初始化swiper，要在vue初始化后，因为vue会对已绑定的事件清除
+        var docWidth = document.documentElement.clientWidth;
+        var mySwiper = new Swiper ('.swiper-container', {
+            // Optional parameters
+            // And if we need scrollbar
+            width: docWidth*0.3,
+            scrollbar: {
+                dragSize: docWidth*0.9,
+                el: '.swiper-scrollbar',
+                snapOnRelease: false
+            },
+        })
+    </script>
+    <script defer src="http://shared.ydstatic.com/js/rlog/v1.js"></script> 
+</body>
+</html>

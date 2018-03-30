@@ -1,0 +1,31 @@
+{
+  "name": "music-api",
+  "version": "1.0.0",
+  "private": true,
+  "description": "music-api app using Express",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "music": "cross-env APPID=wxdd79669be3886b21 SECRET=6f2533b76f33496183234b7c328312aa node server.js",
+    "dev": "cross-env APPID=wxdd79669be3886b21 SECRET=6f2533b76f33496183234b7c328312aa nodemon server.js"
+  },
+  "dependencies": {
+    "async": "^1.5.2",
+    "body-parser": "1.12.3",
+    "connect-timeout": "^1.7.0",
+    "cors": "^2.8.4",
+    "express": "4.12.3",
+    "leancloud-storage": "^3.1.1",
+    "music-api": "^0.3.3",
+    "request": "^2.69.0",
+    "strformat": "0.0.7",
+    "wechat-oauth": "^1.2.1"
+  },
+  "devDependencies": {
+    "cross-env": "^5.0.5",
+    "nodemon": "^1.11.0"
+  },
+  "engines": {
+    "node": "6.x"
+  }
+}

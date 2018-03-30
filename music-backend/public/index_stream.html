@@ -1,0 +1,15 @@
+<!DOCTYPE html><html><head><meta charset=UTF-8><meta content=yes name=apple-mobile-web-app-capable><meta content=yes name=apple-touch-fullscreen><meta content="telephone=no,email=no" name=format-detection><meta http-equiv=X-UA-Compatible content="ie=edge"><meta name=viewport content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no"><script>(function (doc, win) {
+                var docEl = doc.documentElement,
+                  resizeEvt = 'orientationchange' in window ? 'orientationchange' : 'resize',
+                  rescale = function () {
+                      var clientWidth = docEl.clientWidth || window.innerWidth;
+                      var rem = ((clientWidth > 750 ? (750) : (clientWidth*2)) / 750 * 75); // 为了web端和wap看起来不一样,wap端的size*2倍
+                      if (!clientWidth) return;
+                      docEl.style.fontSize = rem + 'px';
+                  };
+    
+                if (!doc.addEventListener) return;
+                doc.addEventListener('DOMContentLoaded', rescale, false);
+                if (docEl.clientWidth > 750) return;
+                win.addEventListener(resizeEvt, rescale, false);
+            })(document, window);</script><title>有道信息流</title><link href=/static/css/app.2d5b1c8da17da2e6b267f2947fa546eb.css rel=stylesheet></head><body><div id=app></div><script src=http://shared.ydstatic.com/js/yadk/1.1.2.js></script><script defer=defer src=http://shared.ydstatic.com/js/rlog/v1.js></script><script type=text/javascript src=/static/js/manifest.8f7dacb8976ea161e779.js></script><script type=text/javascript src=/static/js/vendor.e6f97790395c1c6173f2.js></script><script type=text/javascript src=/static/js/app.dac86f7d92c5daa76b36.js></script></body></html>
